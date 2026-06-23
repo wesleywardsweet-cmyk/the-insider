@@ -1800,7 +1800,9 @@ turnList: {
   marginTop: "20px",
 },
 voteTitle: {
-  fontSize: "52px",
+  fontSize: "clamp(30px, 9vw, 52px)",
+lineHeight: "1.05",
+textAlign: "center",
   fontWeight: "900",
   color: "#ff4d4d",
   textTransform: "uppercase",
