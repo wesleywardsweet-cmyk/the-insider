@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const bugReportsFile = path.join(__dirname, "bugReports.json");
+const gameStatsFile = path.join(__dirname, "gameStats.json");
 
 function loadBugReports() {
   if (!fs.existsSync(bugReportsFile)) return [];
@@ -20,6 +21,33 @@ function saveBugReports(reports) {
   );
 }
 
+function loadGameStats() {
+  if (!fs.existsSync(gameStatsFile)) {
+    return {
+      gamesCreated: 0,
+      gamesStarted: 0,
+      gamesFinished: 0,
+    };
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(gameStatsFile, "utf8"));
+  } catch {
+    return {
+      gamesCreated: 0,
+      gamesStarted: 0,
+      gamesFinished: 0,
+    };
+  }
+}
+
+function saveGameStats(stats) {
+  fs.writeFileSync(
+    gameStatsFile,
+    JSON.stringify(stats, null, 2)
+  );
+}
+
 const bugReports = loadBugReports();
 
 const { Server } = require("socket.io");
@@ -35,11 +63,7 @@ const io = new Server(PORT, {
 
 const rooms = {};
 
-const stats = {
-  gamesCreated: 0,
-  gamesStarted: 0,
-  gamesFinished: 0,
-};
+const stats = loadGameStats();
 
 function logStats() {
   console.log("GAME STATS:", stats);
@@ -110,6 +134,7 @@ waitingPlayers: [],
     };
 
     stats.gamesCreated++;
+saveGameStats(stats);
 logStats();
 
     socket.join(roomCode);
@@ -173,6 +198,7 @@ socket.emit("chat-updated", {
   room.gameInProgress = true;
 
   stats.gamesStarted++;
+saveGameStats(stats);
 logStats();
 
     room.lobbyReadyPlayers = [];
@@ -489,6 +515,7 @@ if (!currentPlayer || currentPlayer.id !== socket.id) {
     room.gameInProgress = false;
 
     stats.gamesFinished++;
+saveGameStats(stats);
 logStats();
 
 if (room.waitingPlayers && room.waitingPlayers.length > 0) {
