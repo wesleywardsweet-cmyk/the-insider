@@ -15,7 +15,7 @@ const playerColors = [
   "#b6ff4d", // Lime
   "#ffffff", // White
 ];
-const socket = io("http://10.0.0.50:3001");
+const socket = io("https://the-insider-tk62.onrender.com");
 function App() {
   const [screen, setScreen] = useState("menu");
   const [playerName, setPlayerName] = useState("");
