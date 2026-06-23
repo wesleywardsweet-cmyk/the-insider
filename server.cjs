@@ -35,6 +35,16 @@ const io = new Server(PORT, {
 
 const rooms = {};
 
+const stats = {
+  gamesCreated: 0,
+  gamesStarted: 0,
+  gamesFinished: 0,
+};
+
+function logStats() {
+  console.log("GAME STATS:", stats);
+}
+
 function createRoomCode() {
   return Math.random().toString(36).substring(2, 6).toUpperCase();
 }
@@ -99,6 +109,9 @@ gameInProgress: false,
 waitingPlayers: [],
     };
 
+    stats.gamesCreated++;
+logStats();
+
     socket.join(roomCode);
 
     socket.emit("room-created", {
@@ -158,6 +171,9 @@ socket.emit("chat-updated", {
   if (!room) return;
 
   room.gameInProgress = true;
+
+  stats.gamesStarted++;
+logStats();
 
     room.lobbyReadyPlayers = [];
     room.readyPlayers = [];
@@ -471,6 +487,9 @@ if (!currentPlayer || currentPlayer.id !== socket.id) {
     if (!playerIsActive) return;
 
     room.gameInProgress = false;
+
+    stats.gamesFinished++;
+logStats();
 
 if (room.waitingPlayers && room.waitingPlayers.length > 0) {
   room.players.push(...room.waitingPlayers);
